@@ -1,0 +1,28 @@
+<div id="app"></div>
+
+<button onclick="renderHome()">Trang chủ</button>
+<button onclick="renderProfile()">Hồ sơ</button>
+
+<script>
+function renderHome() {
+  document.getElementById('app').innerHTML = `
+    <div id="home">
+      <h1>Trang chủ</h1>
+      <p>Chào mừng!</p>
+    </div>
+  `;
+}
+
+function renderProfile() {
+  document.getElementById('app').innerHTML = `
+    <div id="profile">
+      <h1>Hồ sơ</h1>
+      <p>Tên: ABel</p>
+    </div>
+  `;
+}
+
+// Khi vào trang lần đầu
+renderHome();
+</script>
+

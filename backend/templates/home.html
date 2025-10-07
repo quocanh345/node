@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản lý người dùng</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+    }
+    form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input, button {
+      padding: 8px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #aaa;
+      text-align: left;
+    }
+    .actions button {
+      margin-right: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📋 Quản lý người dùng</h1>
+
+  <form id="user-form">
+    <input type="text" id="name" placeholder="Tên" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <button type="submit">Thêm</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Tên</th>
+        <th>Email</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody id="user-list">
+      <!-- Backend sẽ đổ dữ liệu vào đây -->
+    </tbody>
+  </table>
+
+  <script>
+    const API_URL = "http://127.0.0.1:5000/users";
+
+    async function loadUsers() {
+      const res = await fetch(API_URL);
+      const users = await res.json();
+      const tbody = document.getElementById("user-list");
+      tbody.innerHTML = "";
+      users.forEach(u => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${u.id}</td>
+            <td><input type="text" value="${u.name}" id="name-${u.id}"></td>
+            <td><input type="email" value="${u.email}" id="email-${u.id}"></td>
+            <td class="actions">
+              <button onclick="updateUser(${u.id})">Sửa</button>
+              <button onclick="deleteUser(${u.id})">Xóa</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    document.getElementById("user-form").addEventListener("submit", async e => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email })
+      });
+      e.target.reset();
+      loadUsers();
+    });
+
+    async function deleteUser(id) {
+      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      loadUsers();
+    }
+
+    async function updateUser(id) {
+      const name = document.getElementById(`name-${id}`).value;
+      const email = document.getElementById(`email-${id}`).value;
+      await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email })
+      });
+      loadUsers();
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>
+
